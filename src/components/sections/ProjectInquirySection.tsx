@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowUpRight, Check } from 'lucide-react';
+import { ArrowUpRight, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,20 +13,8 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-const contactFields = [
-  {
-    id: 'project-inquiry-name',
-    label: 'Имя',
-    placeholder: 'Иван Иванов',
-    type: 'text',
-  },
-  {
-    id: 'project-inquiry-email',
-    label: 'Email',
-    placeholder: 'ivanivanov@gmail.com',
-    type: 'email',
-  },
-];
+// ←←← Вставь сюда URL своего Apps Script
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyVOtXy13cNt3TsOUwNCjJq1eoHcXG_NwrN3LA43kOe4-Avk3lCkMbaXoWGTsgjFDbx/exec';
 
 const serviceOptions = [
   'Монтаж Reels',
@@ -37,10 +25,50 @@ const serviceOptions = [
 
 export function ProjectInquirySection() {
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [contact, setContact] = useState(''); // Телефон или Telegram
+  const [service, setService] = useState('');
+  const [description, setDescription] = useState('');
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setSubmitted(true);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          contact,
+          service,
+          description,
+        }),
+      });
+
+      setSubmitted(true);
+
+      // Очищаем форму
+      setName('');
+      setEmail('');
+      setContact('');
+      setService('');
+      setDescription('');
+    } catch (err) {
+      setError('Не удалось отправить заявку. Попробуйте ещё раз.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -82,30 +110,68 @@ export function ProjectInquirySection() {
               <h2 className="text-center font-inter text-2xl font-semibold text-white lg:text-[32px]">
                 Обсудим ваш проект
               </h2>
-              <div className="grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2 lg:gap-10">
-                <div className="flex flex-col gap-5">
-                  {contactFields.map((field) => (
-                    <div
-                      key={field.id}
-                      className="flex flex-col items-start gap-[5px]"
-                    >
-                      <Label
-                        htmlFor={field.id}
-                        className="font-inter text-lg font-medium text-white lg:text-xl"
-                      >
-                        {field.label}
-                      </Label>
-                      <Input
-                        id={field.id}
-                        name={field.id}
-                        type={field.type}
-                        placeholder={field.placeholder}
-                        required
-                        className="h-[42px] w-full rounded-[20px] border-[#ffffff99] bg-[#ffffff1a] px-5 py-2.5 font-inter text-base font-medium text-white placeholder:text-[#ffffff99] focus-visible:ring-1 focus-visible:ring-white/70"
-                      />
-                    </div>
-                  ))}
 
+              <div className="grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2 lg:gap-10">
+                {/* Левая колонка */}
+                <div className="flex flex-col gap-5">
+                  {/* Имя */}
+                  <div className="flex flex-col items-start gap-[5px]">
+                    <Label
+                      htmlFor="project-inquiry-name"
+                      className="font-inter text-lg font-medium text-white lg:text-xl"
+                    >
+                      Имя
+                    </Label>
+                    <Input
+                      id="project-inquiry-name"
+                      type="text"
+                      placeholder="Иван Иванов"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="h-[42px] w-full rounded-[20px] border-[#ffffff99] bg-[#ffffff1a] px-5 py-2.5 font-inter text-base font-medium text-white placeholder:text-[#ffffff99] focus-visible:ring-1 focus-visible:ring-white/70"
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div className="flex flex-col items-start gap-[5px]">
+                    <Label
+                      htmlFor="project-inquiry-email"
+                      className="font-inter text-lg font-medium text-white lg:text-xl"
+                    >
+                      Email
+                    </Label>
+                    <Input
+                      id="project-inquiry-email"
+                      type="email"
+                      placeholder="ivanivanov@gmail.com"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-[42px] w-full rounded-[20px] border-[#ffffff99] bg-[#ffffff1a] px-5 py-2.5 font-inter text-base font-medium text-white placeholder:text-[#ffffff99] focus-visible:ring-1 focus-visible:ring-white/70"
+                    />
+                  </div>
+
+                  {/* Телефон или Telegram */}
+                  <div className="flex flex-col items-start gap-[5px]">
+                    <Label
+                      htmlFor="project-inquiry-contact"
+                      className="font-inter text-lg font-medium text-white lg:text-xl"
+                    >
+                      Телефон или Telegram
+                    </Label>
+                    <Input
+                      id="project-inquiry-contact"
+                      type="text"
+                      placeholder="+7 999 123-45-67 или @username"
+                      required
+                      value={contact}
+                      onChange={(e) => setContact(e.target.value)}
+                      className="h-[42px] w-full rounded-[20px] border-[#ffffff99] bg-[#ffffff1a] px-5 py-2.5 font-inter text-base font-medium text-white placeholder:text-[#ffffff99] focus-visible:ring-1 focus-visible:ring-white/70"
+                    />
+                  </div>
+
+                  {/* Услуга */}
                   <div className="flex flex-col items-start gap-[5px]">
                     <Label
                       htmlFor="project-inquiry-service"
@@ -113,10 +179,10 @@ export function ProjectInquirySection() {
                     >
                       Какая услуга вас интересует?
                     </Label>
-                    <Select name="project-inquiry-service">
+                    <Select value={service} onValueChange={setService} required>
                       <SelectTrigger
                         id="project-inquiry-service"
-                        className="h-[42px] w-full rounded-[20px] border-[#ffffff99] bg-[#ffffff1a] px-5 py-2.5 font-inter text-base font-medium text-[#ffffff99] focus:ring-1 focus:ring-white/70"
+                        className="h-[42px] w-full rounded-[20px] border-[#ffffff99] bg-[#ffffff1a] px-5 py-2.5 font-inter text-base font-medium text-white focus:ring-1 focus:ring-white/70"
                       >
                         <SelectValue placeholder="Выбор услуги" />
                       </SelectTrigger>
@@ -130,6 +196,8 @@ export function ProjectInquirySection() {
                     </Select>
                   </div>
                 </div>
+
+                {/* Правая колонка */}
                 <div className="flex min-h-[220px] flex-col gap-5 lg:min-h-0">
                   <div className="flex flex-1 flex-col items-start gap-[5px]">
                     <Label
@@ -140,17 +208,33 @@ export function ProjectInquirySection() {
                     </Label>
                     <Textarea
                       id="project-inquiry-description"
-                      name="project-inquiry-description"
                       placeholder="Например: нужно вести Instagram и делать 8–12 Reels в месяц"
-                      className="min-h-[132px] flex-1 resize-none rounded-[20px] border-[#ffffff99] bg-[#ffffff1a] px-5 py-2.5 font-inter text-base font-medium text-white placeholder:text-[#ffffff99] focus-visible:ring-1 focus-visible:ring-white/70"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="min-h-[180px] flex-1 resize-none rounded-[20px] border-[#ffffff99] bg-[#ffffff1a] px-5 py-2.5 font-inter text-base font-medium text-white placeholder:text-[#ffffff99] focus-visible:ring-1 focus-visible:ring-white/70"
                     />
                   </div>
+
+                  {error && (
+                    <p className="text-sm text-red-200">{error}</p>
+                  )}
+
                   <Button
                     type="submit"
-                    className="h-auto w-full rounded-[20px] bg-white px-0 py-2.5 font-inter text-lg font-semibold text-coral-mid hover:bg-white/90 lg:text-xl"
+                    disabled={isLoading}
+                    className="h-auto w-full rounded-[20px] bg-white px-0 py-2.5 font-inter text-lg font-semibold text-coral-mid hover:bg-white/90 disabled:opacity-70 lg:text-xl"
                   >
-                    Оставить заявку
-                    <ArrowUpRight className="ml-2.5 h-5 w-5" />
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Отправка...
+                      </>
+                    ) : (
+                      <>
+                        Оставить заявку
+                        <ArrowUpRight className="ml-2.5 h-5 w-5" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>

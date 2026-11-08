@@ -6,7 +6,7 @@ const navigationItems = [
   { label: 'Обо мне', href: '#about' },
   { label: 'Услуги', href: '#services' },
   { label: 'Портфолио', href: '#portfolio' },
-  { label: 'Отзывы', href: '#contacts' },
+  { label: 'Контакты', href: '#contacts' },
 ];
 
 type Props = {

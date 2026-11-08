@@ -11,12 +11,28 @@ const socialLinks = [
   {
     name: 'Instagram',
     icon: InstagramIcon,
+    href: 'https://www.instagram.com/evgnia.nzrv?igsi=dnhuNmJkcnJrdXZv',
     className:
       'bg-[linear-gradient(35deg,#f9ed32_0%,#ee2a7b_35%,#d22a8a_45%,#8b2ab2_60%,#1b2af0_90%,#002aff_100%)]',
   },
-  { name: 'Telegram', icon: TelegramIcon, className: 'bg-[#27a6e5]' },
-  { name: 'Вконтакте', icon: VkIcon, className: 'bg-[#0077ff]' },
-  { name: 'TikTok', icon: TikTokIcon, className: 'bg-[#111111]' },
+  {
+    name: 'Telegram',
+    icon: TelegramIcon,
+    href: 'https://t.me/E_nzrv',
+    className: 'bg-[#27a6e5]',
+  },
+  {
+    name: 'Вконтакте',
+    icon: VkIcon,
+    href: 'https://vk.ru/id453066813',
+    className: 'bg-[#0077ff]',
+  },
+  {
+    name: 'TikTok',
+    icon: TikTokIcon,
+    href: 'https://www.tiktok.com/@zhenya_zhuzha?_r=1&_t=ZS-99LDA93qiBz',
+    className: 'bg-[#111111]',
+  },
 ];
 
 const workSteps = [
@@ -105,7 +121,9 @@ export function AboutAndContactSection() {
                   return (
                     <a
                       key={socialLink.name}
-                      href="#contacts"
+                      href={socialLink.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={`flex min-h-[60px] w-full items-center justify-center gap-2.5 rounded-[20px] px-3 py-4 font-inter text-lg font-medium text-white transition-opacity hover:opacity-90 sm:min-h-[64px] sm:text-xl ${socialLink.className}`}
                     >
                       <Icon className="h-5 w-5 shrink-0 text-white sm:h-6 sm:w-6" />
